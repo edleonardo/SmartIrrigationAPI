@@ -6,13 +6,13 @@
   "password": "8888fbec6fa748bf7e7c5c0915a1dd8cd01b0e81c7a4a0cfe7cb82335bdd6727",
   "database": "d4gn0e8pebvvre",
   "entities": [
-    "./src/models/*.ts"
+    "./dist/models/*.js"
   ],
   "migrations": [
-    "./src/database/migrations/*.ts"
+    "./dist/database/migrations/*.js"
   ],
   "cli": {
-    "migrationsDir": "./src/database/migrations"
+    "migrationsDir": "./dist/database/migrations"
   },
   "ssl": { 
     "rejectUnauthorized": false
