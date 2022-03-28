@@ -12,14 +12,14 @@ export class createMeterings1646259327448 implements MigrationInterface {
             type: 'varchar',
             isPrimary: true,
             generationStrategy: 'uuid',
-            default: 'NEWID()'
+            default: 'uuid_generate_v1()'
           },
           {
             name: 'flow_rate',
             type: 'varchar',
           },
           {
-            name: 'device',
+            name: 'device_id',
             type: 'varchar'
           },
           {

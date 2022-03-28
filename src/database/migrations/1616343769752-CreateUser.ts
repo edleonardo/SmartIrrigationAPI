@@ -12,14 +12,14 @@ export class CreateUser1616343769752 implements MigrationInterface {
             type: 'varchar',
             isPrimary: true,
             generationStrategy: 'uuid',
-            default: 'NEWID()'
+            default: 'uuid_generate_v1()'
           },
           {
-            name: 'nome',
+            name: 'name',
             type: 'varchar',
           },
           {
-            name: 'senha',
+            name: 'password',
             type: 'varchar'
           },
           {

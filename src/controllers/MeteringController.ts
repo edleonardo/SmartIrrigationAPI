@@ -10,7 +10,7 @@ async function create(request: Request, response: Response) {
     const meteringRepository = getRepository(Metering)
     const meteringToSave = meteringRepository.create({
       flow_rate: metering.flow_rate.value,
-      device: metering.id,
+      device_id: metering.id,
       timeInstant: metering.TimeInstant.value,
       humidity: metering.humidity.value,
       humiditySoil: metering.humiditySoil.value,

@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn } from 'typeorm'
+import 'reflect-metadata'
 import Device from './Device';
 
 @Entity('users')
@@ -6,13 +7,13 @@ class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar'})
   name!: string;
 
-  @Column()
+  @Column({ type: 'varchar'})
   email!: string;
 
-  @Column()
+  @Column({ type: 'varchar'})
   password!: string;
 
   @OneToMany(() => Device, device => device.user_id)

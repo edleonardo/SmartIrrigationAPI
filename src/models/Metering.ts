@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('meterings')
@@ -5,28 +6,28 @@ class Metering {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar'})
   flow_rate!: string;
 
-  @Column()
-  device!: string;
+  @Column({ type: 'varchar'})
+  device_id!: string;
 
-  @Column()
+  @Column({ type: 'varchar'})
   timeInstant!: string;
 
-  @Column()
+  @Column({ type: 'varchar'})
   humidity!: string;
 
-  @Column()
+  @Column({ type: 'varchar'})
   humiditySoil!: string;
 
-  @Column()
+  @Column({ type: 'varchar'})
   temperature!: string;
 
-  @Column()
+  @Column({ type: 'varchar'})
   commandInfo!: string;
 
-  @Column()
+  @Column({ type: 'varchar'})
   totalFlow!: string;
 }
 

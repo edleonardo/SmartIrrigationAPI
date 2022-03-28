@@ -12,7 +12,7 @@ export class createDevices1648174777128 implements MigrationInterface {
             type: 'varchar',
             isPrimary: true,
             generationStrategy: 'uuid',
-            default: 'NEWID()'
+            default: 'uuid_generate_v1()'
           },
           {
             name: 'name',
@@ -36,7 +36,8 @@ export class createDevices1648174777128 implements MigrationInterface {
 					},
 					{
 						name: 'last_metering',
-						type: 'varchar'
+						type: 'varchar',
+            isNullable: true
 					}
         ],
 				foreignKeys: [
