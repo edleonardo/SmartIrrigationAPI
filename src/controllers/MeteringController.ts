@@ -10,7 +10,7 @@ async function create(request: Request, response: Response) {
     const metering = data[0]
     const meteringRepository = getRepository(Metering)
     moment.locale('pt-br')
-    const now = moment().format("DD-MM-YYYYTkk:mm:ss")    
+    const now = moment().subtract(3, 'hours').format("DD-MM-YYYYTkk:mm:ss")    
     const meteringToSave = meteringRepository.create({
       flow_rate: metering.flow_rate.value,
       device_id: metering.id,
