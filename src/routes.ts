@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Request, Response, Router } from 'express'
 import DeviceController from './controllers/DeviceController'
 import MeteringController from './controllers/MeteringController'
 import UserController from './controllers/UserController'
@@ -9,6 +9,7 @@ const routes = Router()
 routes.post('/user', UserController.create)
 routes.post('/auth', UserController.authenticate)
 routes.post('/subscription', MeteringController.create)
+routes.get('/health-check', (req: Request, res: Response) => res.send('OK'))
 
 routes.use(verifyAuth)
 routes.put('/user/:id', UserController.update)
