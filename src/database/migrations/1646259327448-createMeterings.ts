@@ -41,6 +41,10 @@ export class createMeterings1646259327448 implements MigrationInterface {
           {
             name: 'commandInfo',
             type: 'boolean'
+          },
+          {
+            name: 'totalFlow',
+            type: 'varchar'
           }
         ]
       })

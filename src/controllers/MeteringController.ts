@@ -1,30 +1,33 @@
 import { getRepository } from 'typeorm';
 import { Request, Response } from 'express'
 import Metering from '../models/Metering';
-import Device from '../models/Device';
+import Device from '../models/Device'
+import moment from 'moment';
 
 async function create(request: Request, response: Response) {
   try {
     const { data } = request.body
     const metering = data[0]
     const meteringRepository = getRepository(Metering)
+    moment.locale('pt-br')
+    const now = moment().format("DD-MM-YYYYTkk:mm:ss")    
     const meteringToSave = meteringRepository.create({
       flow_rate: metering.flow_rate.value,
       device_id: metering.id,
-      timeInstant: metering.TimeInstant.value,
+      timeInstant: now,
       humidity: metering.humidity.value,
       humiditySoil: metering.humiditySoil.value,
-      commandInfo: metering.on_status.value ?? 'off',
+      commandInfo: metering.on_status.value.trim() === '1' ? false : true,
       temperature: metering.temperature.value,
-      totalFlow: metering.totalFlow.value
+      totalFlow: metering.total_flow.value
     })
-    
+
     const deviceRepository = getRepository(Device)
     const device = await deviceRepository.findOneOrFail({
       where: { device_id: metering.id }
     })
 
-    deviceRepository.merge(device, { last_metering: metering.TimeInstant.value})
+    deviceRepository.merge(device, { last_metering: now })
 
     await Promise.all([
       meteringRepository.save(meteringToSave),

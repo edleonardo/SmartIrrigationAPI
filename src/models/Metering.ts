@@ -24,8 +24,8 @@ class Metering {
   @Column({ type: 'varchar'})
   temperature!: string;
 
-  @Column({ type: 'varchar'})
-  commandInfo!: string;
+  @Column({ type: 'boolean'})
+  commandInfo!: boolean;
 
   @Column({ type: 'varchar'})
   totalFlow!: string;
