@@ -1,10 +1,10 @@
 {
-  "type": "postgres",
-  "host": "host-name",
-  "port": "port",
-  "username": "username",
-  "password": "password",
-  "database": "database",
+  "type": "",
+  "host": "",
+  "port": "",
+  "username": "",
+  "password": "",
+  "database": "",
   "entities": [
     "./dist/models/*.js"
   ],
