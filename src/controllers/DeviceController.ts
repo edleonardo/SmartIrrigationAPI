@@ -23,7 +23,7 @@ async function create(request: Request, response: Response) {
     })
 
     if (checkIfDeviceAlreadyExists) {
-      throw new Error('Endereço de email já está sendo utilizado');
+      throw new Error('Device já cadastrado');
     }
 
     const device = deviceRepository.create({

@@ -29,6 +29,9 @@ class Metering {
 
   @Column({ type: 'varchar'})
   totalFlow!: string;
+
+  @Column({ type: 'int8' })
+  created_at!: number
 }
 
 export default Metering;

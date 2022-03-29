@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { getRepository, Between } from 'typeorm';
 import { Request, Response } from 'express'
 import Metering from '../models/Metering';
 import Device from '../models/Device'
@@ -19,7 +19,8 @@ async function create(request: Request, response: Response) {
       humiditySoil: metering.humiditySoil.value,
       commandInfo: metering.on_status.value.trim() === '1' ? false : true,
       temperature: metering.temperature.value,
-      totalFlow: metering.total_flow.value
+      totalFlow: metering.total_flow.value,
+      created_at: moment().subtract(3, 'hours').unix()
     })
 
     const deviceRepository = getRepository(Device)
@@ -40,6 +41,34 @@ async function create(request: Request, response: Response) {
   }
 }
 
+function index(request: Request, response: Response) {
+  try {
+    
+    const { month } = request.query
+    
+    if (month) {
+      const monthIndex = parseInt(month.toString()) - 1
+      const beginOfMonth = moment().set('month', monthIndex).startOf('month').unix()  
+      const endOfMonth = moment().set('month', monthIndex).startOf('month').unix()
+      const whereBetween = Between(beginOfMonth, endOfMonth)
+      
+      const meteringRepository = getRepository(Metering)
+      const meterings = meteringRepository.find({
+        where: {
+          created_at: whereBetween
+        }
+      })
+
+      return response.status(200).json(meterings)
+    } else {
+      throw new Error('Faltando o parametro month');
+    }
+  } catch (error) {
+    return response.status(400).json({ message: Object(error).message })
+  }
+}
+
 export default {
-  create
+  create,
+  index
 }

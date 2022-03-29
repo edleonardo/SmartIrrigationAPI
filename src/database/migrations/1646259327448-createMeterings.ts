@@ -45,6 +45,10 @@ export class createMeterings1646259327448 implements MigrationInterface {
           {
             name: 'totalFlow',
             type: 'varchar'
+          },
+          {
+            name: 'created_at',
+            type: 'int8'
           }
         ]
       })
