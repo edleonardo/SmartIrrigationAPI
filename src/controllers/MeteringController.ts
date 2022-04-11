@@ -41,7 +41,7 @@ async function create(request: Request, response: Response) {
   }
 }
 
-function index(request: Request, response: Response) {
+async function index(request: Request, response: Response) {
   try {
     
     const { month } = request.query
@@ -53,11 +53,7 @@ function index(request: Request, response: Response) {
       const whereBetween = Between(beginOfMonth, endOfMonth)
       
       const meteringRepository = getRepository(Metering)
-      const meterings = meteringRepository.find({
-        where: {
-          created_at: whereBetween
-        }
-      })
+      const meterings = await meteringRepository.find()
 
       return response.status(200).json(meterings)
     } else {
