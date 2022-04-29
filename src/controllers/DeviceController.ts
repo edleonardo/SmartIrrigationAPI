@@ -2,7 +2,7 @@ import { getRepository } from 'typeorm';
 import { Request, Response } from 'express'
 import * as Yup from 'yup'
 import Device from '../models/Device';
-
+import Metering from '../models/Metering';
 
 async function create(request: Request, response: Response) {
   try {
@@ -52,16 +52,46 @@ async function index(request: Request, response: Response) {
       where: { user_id: userId }
     })
 
+    const amountActive = devices.filter(item => item.active === true).length
+    const amountInactive = devices.filter(item => item.active === false).length
+
     return response.status(200).json({
       devices: devices,
-      amount: devices.length
+      amountActive,
+      amountInactive 
     })
   } catch (error) {
     return response.status(404).json({ message: Object(error).message })
   }
 }
 
+async function show(request: Request, response: Response) {
+  try {
+    const { id } = request.params
+  
+    const deviceRepository = getRepository(Device)
+    const device = await deviceRepository.findOneOrFail(id)
+
+    const meteringRepository = getRepository(Metering)
+
+    const metering = await meteringRepository.find({
+      where: {
+        timeInstant: device.last_metering
+      }
+    })
+
+    return response.status(200).json({
+      ...device, lastMetering: metering
+    })
+    
+  } catch (error) {
+    return response.status(404).json({ message: Object(error).message })
+  }
+  
+}
+
 export default {
   create,
-  index
+  index,
+  show
 }
