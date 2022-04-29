@@ -4,6 +4,24 @@ import Metering from '../models/Metering';
 import Device from '../models/Device'
 import moment from 'moment';
 
+const assembleHumidity = (meterings: Array<any>, parameter: string) => {
+
+  const formattedResponse = meterings.reduce((obj, item) => Object.assign(obj, { [item.created_at]: item[parameter] }))
+
+  delete formattedResponse.id
+  delete formattedResponse.flow_rate
+  delete formattedResponse.device_id
+  delete formattedResponse.timeInstant
+  delete formattedResponse.humidity
+  delete formattedResponse.humiditySoil
+  delete formattedResponse.temperature
+  delete formattedResponse.commandInfo
+  delete formattedResponse.totalFlow
+  delete formattedResponse.created_at
+
+  return formattedResponse
+}
+
 async function create(request: Request, response: Response) {
   try {
     const { data } = request.body
@@ -41,21 +59,52 @@ async function create(request: Request, response: Response) {
   }
 }
 
-async function index(request: Request, response: Response) {
+async function getSoilHumidity(request: Request, response: Response) {
   try {
-    
     const { month } = request.query
     
     if (month) {
       const monthIndex = parseInt(month.toString()) - 1
       const beginOfMonth = moment().set('month', monthIndex).startOf('month').unix()  
-      const endOfMonth = moment().set('month', monthIndex).startOf('month').unix()
-      const whereBetween = Between(beginOfMonth, endOfMonth)
+      const endOfMonth = moment().set('month', monthIndex).endOf('month').unix()
+      const whereBetween = Between(beginOfMonth.toString(), endOfMonth.toString())
+      console.log(whereBetween)
       
       const meteringRepository = getRepository(Metering)
-      const meterings = await meteringRepository.find()
+      const meterings = await meteringRepository.find({
+        where: {
+          created_at: whereBetween,
+          
+        }
+      })
 
-      return response.status(200).json(meterings)
+      return response.status(200).json(meterings.length > 0 ? assembleHumidity(meterings, 'humiditySoil') : [])
+    } else {
+      throw new Error('Faltando o parametro month');
+    }
+  } catch (error) {
+    return response.status(400).json({ message: Object(error).message })
+  }
+}
+
+async function getAirHumidity(request: Request, response: Response) {
+  try {
+    const { month } = request.query
+    
+    if (month) {
+      const monthIndex = parseInt(month.toString()) - 1
+      const beginOfMonth = moment().set('month', monthIndex).startOf('month').unix()  
+      const endOfMonth = moment().set('month', monthIndex).endOf('month').unix()
+      const whereBetween = Between(beginOfMonth.toString(), endOfMonth.toString())
+      
+      const meteringRepository = getRepository(Metering)
+      const meterings = await meteringRepository.find({
+        where: {
+          created_at: whereBetween
+        }
+      })
+
+      return response.status(200).json(meterings.length > 0 ? assembleHumidity(meterings, 'humidity') : [])
     } else {
       throw new Error('Faltando o parametro month');
     }
@@ -66,5 +115,6 @@ async function index(request: Request, response: Response) {
 
 export default {
   create,
-  index
+  getAirHumidity,
+  getSoilHumidity
 }

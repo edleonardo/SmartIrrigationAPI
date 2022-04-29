@@ -7,19 +7,9 @@ import * as Yup from 'yup'
 
 import User from '../models/User'
 
-async function authenticate(request: Request, response: Response) {
+const makeAuth = async (email: string, password: string) => {
   try {
-    const { email, password } = request.body
-    
-    const schema = Yup.object().shape({
-      email: Yup.string().email().required(),
-      password: Yup.string().required()
-    })
-    await schema.validate({ email, password }, { abortEarly: false })
-    
-    
     const usersRepository = getRepository(User);
-    
     const user = await usersRepository.findOne({ where: { email } });
     
     if (!user) {
@@ -37,10 +27,26 @@ async function authenticate(request: Request, response: Response) {
       expiresIn: authConfig.jwt.expiresIn,
     });
     
-    return response.status(200).json({
+    return ({
       user,
       token
     })
+  } catch (error) {
+    throw error
+  }
+}
+
+async function authenticate(request: Request, response: Response) {
+  try {
+    const { email, password } = request.body
+    
+    const schema = Yup.object().shape({
+      email: Yup.string().email().required(),
+      password: Yup.string().required()
+    })
+    await schema.validate({ email, password }, { abortEarly: false })
+    
+    return response.status(200).json(await makeAuth(email, password))
   } catch (error) {
     return response.status(400).json({ message: Object(error).message })
   }
@@ -78,7 +84,7 @@ async function create (request: Request, response: Response) {
     
     await userRepository.save(user);
     
-    return response.sendStatus(201);
+    return response.status(200).json(await makeAuth(email, password))
   } catch (error) {
     return response.status(400).json({ message: Object(error).message })
   }
