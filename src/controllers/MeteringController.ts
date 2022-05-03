@@ -111,8 +111,35 @@ async function getAirHumidity(request: Request, response: Response) {
   }
 }
 
+async function getTemperature(request: Request, response: Response) {
+  try {
+    const { month } = request.query
+    
+    if (month) {
+      const monthIndex = parseInt(month.toString()) - 1
+      const beginOfMonth = moment().set('month', monthIndex).startOf('month').unix()  
+      const endOfMonth = moment().set('month', monthIndex).endOf('month').unix()
+      const whereBetween = Between(beginOfMonth.toString(), endOfMonth.toString())
+      
+      const meteringRepository = getRepository(Metering)
+      const meterings = await meteringRepository.find({
+        where: {
+          created_at: whereBetween
+        }
+      })
+
+      return response.status(200).json(meterings.length > 0 ? assembleHumidity(meterings, 'temperature') : [])
+    } else {
+      throw new Error('Faltando o parametro month');
+    }
+  } catch (error) {
+    return response.status(400).json({ message: Object(error).message })
+  }
+}
+
 export default {
   create,
   getAirHumidity,
-  getSoilHumidity
+  getSoilHumidity,
+  getTemperature
 }
