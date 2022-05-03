@@ -6,7 +6,7 @@ import moment from 'moment';
 
 const assembleHumidity = (meterings: Array<any>, parameter: string) => {
 
-  const formattedResponse = meterings.reduce((obj, item) => Object.assign(obj, { [item.created_at]: item[parameter] }))
+  const formattedResponse = meterings.reduce((obj, item) => Object.assign(obj, { [item.created_at]: parseFloat(item[parameter]) }))
 
   delete formattedResponse.id
   delete formattedResponse.flow_rate
@@ -68,13 +68,11 @@ async function getSoilHumidity(request: Request, response: Response) {
       const beginOfMonth = moment().set('month', monthIndex).startOf('month').unix()  
       const endOfMonth = moment().set('month', monthIndex).endOf('month').unix()
       const whereBetween = Between(beginOfMonth.toString(), endOfMonth.toString())
-      console.log(whereBetween)
       
       const meteringRepository = getRepository(Metering)
       const meterings = await meteringRepository.find({
         where: {
-          created_at: whereBetween,
-          
+          created_at: whereBetween
         }
       })
 
