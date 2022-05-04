@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Double } from 'typeorm';
 
 @Entity('meterings')
 class Metering {
@@ -13,16 +13,16 @@ class Metering {
   device_id!: string;
 
   @Column({ type: 'varchar'})
-  timeInstant!: string;
+  time_instant!: string;
 
-  @Column({ type: 'varchar'})
-  humidity!: string;
+  @Column({ type: 'float'})
+  humidity!: Double;
 
-  @Column({ type: 'varchar'})
-  humiditySoil!: string;
+  @Column({ type: 'float'})
+  humidity_soil!: Double;
 
-  @Column({ type: 'varchar'})
-  temperature!: string;
+  @Column({ type: 'float'})
+  temperature!: Double;
 
   @Column({ type: 'boolean'})
   commandInfo!: boolean;

@@ -4,22 +4,44 @@ import Metering from '../models/Metering';
 import Device from '../models/Device'
 import moment from 'moment';
 
-const assembleHumidity = (meterings: Array<any>, parameter: string) => {
+const formatDate = (date:string) => {
+  const arrayDate = date.split('-')
+  return `${arrayDate[1]}/${arrayDate[0]}/${arrayDate[2]}`
+}
 
-  const formattedResponse = meterings.reduce((obj, item) => Object.assign(obj, { [item.created_at]: parseFloat(item[parameter]) }))
+const assembleHumidity = (meterings: Array<any>) => {
+  const formattedResponse = meterings.reduce((obj, item) => 
+    Object.assign(obj, { 
+      [Date.parse(formatDate(item.agrouppeddate)).toString()]: parseFloat(item.media) 
+    }))
+  
+  Object.assign(formattedResponse, {
+    [Date.parse(formatDate(formattedResponse.agrouppeddate)).toString()]: 
+    parseFloat(formattedResponse.media)
+  })
 
-  delete formattedResponse.id
-  delete formattedResponse.flow_rate
-  delete formattedResponse.device_id
-  delete formattedResponse.timeInstant
-  delete formattedResponse.humidity
-  delete formattedResponse.humiditySoil
-  delete formattedResponse.temperature
-  delete formattedResponse.commandInfo
-  delete formattedResponse.totalFlow
-  delete formattedResponse.created_at
+  delete formattedResponse.agrouppeddate
+  delete formattedResponse.media
 
   return formattedResponse
+}
+
+const getDailyAVG = async (month:number, parameter:string) => {
+  const monthIndex = month - 1
+  const beginOfMonth = moment().set('month', monthIndex).startOf('month').unix()  
+  const endOfMonth = moment().set('month', monthIndex).endOf('month').unix()
+  const whereBetween = Between(beginOfMonth.toString(), endOfMonth.toString())
+  
+  const meteringRepository = getRepository(Metering)
+  const meterings = await meteringRepository.createQueryBuilder()
+    .select(`AVG(${parameter})`, "media")
+    .addSelect("split_part(time_instant, 'T', 1) as agrouppedDate")
+    .where({
+      created_at: whereBetween
+    })
+    .groupBy('agrouppedDate').getRawMany()
+
+  return assembleHumidity(meterings)
 }
 
 async function create(request: Request, response: Response) {
@@ -32,11 +54,11 @@ async function create(request: Request, response: Response) {
     const meteringToSave = meteringRepository.create({
       flow_rate: metering.flow_rate.value,
       device_id: metering.id,
-      timeInstant: now,
-      humidity: metering.humidity.value,
-      humiditySoil: metering.humiditySoil.value,
+      time_instant: now,
+      humidity: parseFloat(metering.humidity.value),
+      humidity_soil: parseFloat(metering.humiditySoil.value),
       commandInfo: metering.on_status.value.trim() === '1' ? false : true,
-      temperature: metering.temperature.value,
+      temperature: parseFloat(metering.temperature.value),
       totalFlow: metering.total_flow.value,
       created_at: moment().subtract(3, 'hours').unix()
     })
@@ -64,19 +86,9 @@ async function getSoilHumidity(request: Request, response: Response) {
     const { month } = request.query
     
     if (month) {
-      const monthIndex = parseInt(month.toString()) - 1
-      const beginOfMonth = moment().set('month', monthIndex).startOf('month').unix()  
-      const endOfMonth = moment().set('month', monthIndex).endOf('month').unix()
-      const whereBetween = Between(beginOfMonth.toString(), endOfMonth.toString())
-      
-      const meteringRepository = getRepository(Metering)
-      const meterings = await meteringRepository.find({
-        where: {
-          created_at: whereBetween
-        }
-      })
+      const meterings = await getDailyAVG(parseInt(month.toString()), 'humidity_soil')
 
-      return response.status(200).json(meterings.length > 0 ? assembleHumidity(meterings, 'humiditySoil') : [])
+      return response.status(200).json(meterings)
     } else {
       throw new Error('Faltando o parametro month');
     }
@@ -90,19 +102,9 @@ async function getAirHumidity(request: Request, response: Response) {
     const { month } = request.query
     
     if (month) {
-      const monthIndex = parseInt(month.toString()) - 1
-      const beginOfMonth = moment().set('month', monthIndex).startOf('month').unix()  
-      const endOfMonth = moment().set('month', monthIndex).endOf('month').unix()
-      const whereBetween = Between(beginOfMonth.toString(), endOfMonth.toString())
-      
-      const meteringRepository = getRepository(Metering)
-      const meterings = await meteringRepository.find({
-        where: {
-          created_at: whereBetween
-        }
-      })
+      const meterings = await getDailyAVG(parseInt(month.toString()), 'humidity')
 
-      return response.status(200).json(meterings.length > 0 ? assembleHumidity(meterings, 'humidity') : [])
+      return response.status(200).json(meterings)
     } else {
       throw new Error('Faltando o parametro month');
     }
@@ -116,19 +118,9 @@ async function getTemperature(request: Request, response: Response) {
     const { month } = request.query
     
     if (month) {
-      const monthIndex = parseInt(month.toString()) - 1
-      const beginOfMonth = moment().set('month', monthIndex).startOf('month').unix()  
-      const endOfMonth = moment().set('month', monthIndex).endOf('month').unix()
-      const whereBetween = Between(beginOfMonth.toString(), endOfMonth.toString())
-      
-      const meteringRepository = getRepository(Metering)
-      const meterings = await meteringRepository.find({
-        where: {
-          created_at: whereBetween
-        }
-      })
+      const meterings = await getDailyAVG(parseInt(month.toString()), 'temperature')
 
-      return response.status(200).json(meterings.length > 0 ? assembleHumidity(meterings, 'temperature') : [])
+      return response.status(200).json(meterings)
     } else {
       throw new Error('Faltando o parametro month');
     }

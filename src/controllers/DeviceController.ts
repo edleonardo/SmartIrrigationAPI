@@ -76,7 +76,7 @@ async function show(request: Request, response: Response) {
 
     const metering = await meteringRepository.find({
       where: {
-        timeInstant: device.last_metering
+        time_instant: device.last_metering
       }
     })
 

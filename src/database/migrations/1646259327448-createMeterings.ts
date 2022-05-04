@@ -23,20 +23,20 @@ export class createMeterings1646259327448 implements MigrationInterface {
             type: 'varchar'
           },
           {
-            name: 'timeInstant',
+            name: 'time_instant',
             type: 'varchar'
           },
           {
             name: 'humidity',
-            type: 'varchar'
+            type: 'float'
           },
           {
-            name: 'humiditySoil',
-            type: 'varchar'
+            name: 'humidity_soil',
+            type: 'float'
           },
           {
             name: 'temperature',
-            type: 'varchar'
+            type: 'float'
           },
           {
             name: 'commandInfo',
