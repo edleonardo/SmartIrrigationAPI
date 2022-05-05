@@ -42,7 +42,7 @@ const getDailyAVG = async (month:number, parameter:string, device_id: string) =>
     })
     .groupBy('agrouppedDate').getRawMany()
 
-  return assembleHumidity(meterings)
+  return meterings.length > 0 ? assembleHumidity(meterings) : []
 }
 
 async function create(request: Request, response: Response) {
