@@ -6,10 +6,10 @@
 	"password": "5d1c04dc1ffa3efbeae16ea34f5f88f1be1ccfa193a0791fe91b1fe5bd9e04fd",
 	"database": "d2r0md6h11jle2",
 	"entities": [
-		"./src/models/*.ts"
+		"./dist/models/*.js"
 	],
 	"migrations": [
-		"./src/database/migrations/*.ts"
+		"./dist/database/migrations/*.js"
 	],
 	"cli": {
 		"migrationsDir": "./src/database/migrations"
