@@ -26,7 +26,7 @@ const assembleHumidity = (meterings: Array<any>) => {
   return formattedResponse
 }
 
-const getDailyAVG = async (month:number, parameter:string) => {
+const getDailyAVG = async (month:number, parameter:string, device_id: string) => {
   const monthIndex = month - 1
   const beginOfMonth = moment().set('month', monthIndex).startOf('month').unix()  
   const endOfMonth = moment().set('month', monthIndex).endOf('month').unix()
@@ -37,7 +37,8 @@ const getDailyAVG = async (month:number, parameter:string) => {
     .select(`AVG(${parameter})`, "media")
     .addSelect("split_part(time_instant, 'T', 1) as agrouppedDate")
     .where({
-      created_at: whereBetween
+      created_at: whereBetween,
+      device_id      
     })
     .groupBy('agrouppedDate').getRawMany()
 
@@ -83,14 +84,14 @@ async function create(request: Request, response: Response) {
 
 async function getSoilHumidity(request: Request, response: Response) {
   try {
-    const { month } = request.query
+    const { month, device_id } = request.query
     
-    if (month) {
-      const meterings = await getDailyAVG(parseInt(month.toString()), 'humidity_soil')
+    if (month && device_id) {
+      const meterings = await getDailyAVG(parseInt(month.toString()), 'humidity_soil', device_id.toString())
 
       return response.status(200).json(meterings)
     } else {
-      throw new Error('Faltando o parametro month');
+      throw new Error('É necessário enviar os parâmetros month e device_id');
     }
   } catch (error) {
     return response.status(400).json({ message: Object(error).message })
@@ -99,14 +100,14 @@ async function getSoilHumidity(request: Request, response: Response) {
 
 async function getAirHumidity(request: Request, response: Response) {
   try {
-    const { month } = request.query
+    const { month, device_id }  = request.query
     
-    if (month) {
-      const meterings = await getDailyAVG(parseInt(month.toString()), 'humidity')
+    if (month && device_id) {
+      const meterings = await getDailyAVG(parseInt(month.toString()), 'humidity', device_id.toString())
 
       return response.status(200).json(meterings)
     } else {
-      throw new Error('Faltando o parametro month');
+      throw new Error('É necessário enviar os parâmetros month e device_id');
     }
   } catch (error) {
     return response.status(400).json({ message: Object(error).message })
@@ -115,14 +116,14 @@ async function getAirHumidity(request: Request, response: Response) {
 
 async function getTemperature(request: Request, response: Response) {
   try {
-    const { month } = request.query
+    const { month, device_id } = request.query
     
-    if (month) {
-      const meterings = await getDailyAVG(parseInt(month.toString()), 'temperature')
+    if (month && device_id) {
+      const meterings = await getDailyAVG(parseInt(month.toString()), 'temperature', device_id.toString())
 
       return response.status(200).json(meterings)
     } else {
-      throw new Error('Faltando o parametro month');
+      throw new Error('É necessário enviar os parâmetros month e device_id');
     }
   } catch (error) {
     return response.status(400).json({ message: Object(error).message })
