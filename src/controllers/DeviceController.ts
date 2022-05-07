@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { createQueryBuilder, getRepository } from 'typeorm';
 import { Request, Response } from 'express'
 import * as Yup from 'yup'
 import Device from '../models/Device';
@@ -46,14 +46,15 @@ async function index(request: Request, response: Response) {
   try {
     const { userId } = request.headers
     
-    const deviceRepository = getRepository(Device)
-
-    const devices = await deviceRepository.find({
-      where: { user_id: userId }
-    })
-
-    const amountActive = devices.filter(item => item.active === true).length
-    const amountInactive = devices.filter(item => item.active === false).length
+    const devices = await createQueryBuilder('devices', 'd')
+      .leftJoinAndMapOne('d.last_metering', 'meterings', 'm', 'd.last_metering = m.time_instant')
+      .where({
+        user_id: userId 
+      })
+      .getMany()
+    
+    const amountActive = devices.filter(item => Object(item).active === true).length
+    const amountInactive = devices.filter(item => Object(item).active === false).length
 
     return response.status(200).json({
       devices: devices,
