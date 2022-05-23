@@ -1,4 +1,2 @@
-*.json
 node_modules
 .env
-src/config/auth.ts

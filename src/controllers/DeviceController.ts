@@ -19,7 +19,7 @@ async function create(request: Request, response: Response) {
     const deviceRepository = getRepository(Device)
     
     const checkIfDeviceAlreadyExists = await deviceRepository.findOne({
-      where: { device_id }
+      where: { device_id: device_id, user_id: userId }
     })
 
     if (checkIfDeviceAlreadyExists) {
@@ -35,7 +35,7 @@ async function create(request: Request, response: Response) {
     })
 
     await deviceRepository.save(device)
-    return response.sendStatus(201);
+    return response.status(201).json(device);
 
   } catch (error) {
     return response.status(400).json({ message: Object(error).message })

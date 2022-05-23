@@ -1,0 +1,20 @@
+{
+	"type": "postgres",
+	"host": "ec2-52-21-136-176.compute-1.amazonaws.com",
+	"port": 5432,
+	"username": "yimotjqypfaxgr",
+	"password": "5d1c04dc1ffa3efbeae16ea34f5f88f1be1ccfa193a0791fe91b1fe5bd9e04fd",
+	"database": "d2r0md6h11jle2",
+	"entities": [
+		"./dist/models/*.js"
+	],
+	"migrations": [
+		"./dist/database/migrations/*.js"
+	],
+	"cli": {
+		"migrationsDir": "./dist/database/migrations"
+	},
+	"ssl": { 
+		"rejectUnauthorized": false
+	}
+}
